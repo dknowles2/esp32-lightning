@@ -31,25 +31,41 @@ void setup()
   mp3.volume(30);
 }
 
+bool audioPlaying()
+{
+  return digitalRead(kPinAudioBusy) == 0;
+}
+
+void playThunder()
+{
+  Serial.print("Playing thunder MP3");
+  mp3.play(1);
+  while (!audioPlaying())
+  {
+    Serial.print(".");
+    delay(100);
+  }
+  Serial.println();
+}
+
 void loop()
 {
-  Serial.println("");
-  mp3.play(1);
-  delay(100);
-
-  for (int audioBusy = digitalRead(kPinAudioBusy); audioBusy == 0;)
+  playThunder();
+  bool ledOn = false;
+  while (audioPlaying())
   {
     int audioLevel = analogRead(kPinAudioLevel);
-    Serial.print(audioLevel);
-    Serial.print(" ");
-    if (audioLevel >= kAudioHigh)
+    if (!ledOn && audioLevel >= kAudioHigh)
     {
-      Serial.println("large number! ");
+      ledOn = true;
       digitalWrite(kPinLights, HIGH);
+      Serial.print("*");
     }
-    if (audioLevel <= kAudioLow)
+    if (ledOn && audioLevel <= kAudioLow)
     {
+      ledOn = false;
       digitalWrite(kPinLights, LOW);
     }
   }
+  Serial.println();
 }
