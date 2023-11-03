@@ -6,8 +6,8 @@
 
 DFRobotDFPlayerMini mp3;
 
-const int kAudioHigh = 3000;
-const int kAudioLow = 2000;
+const int kAudioHigh = 3500;
+const int kAudioLow = 2500;
 const int kPinAudioBusy = 4;  // Audio player busy
 const int kPinAudioLevel = 2; // Audio level samples
 const int kPinLights = 12;    // IRL520 mosfet gate for LED strip light
@@ -51,19 +51,16 @@ void playThunder()
 void loop()
 {
   playThunder();
-  bool ledOn = false;
   while (audioPlaying())
   {
     int audioLevel = analogRead(kPinAudioLevel);
-    if (!ledOn && audioLevel >= kAudioHigh)
+    if (audioLevel >= kAudioHigh)
     {
-      ledOn = true;
       digitalWrite(kPinLights, HIGH);
       Serial.print("*");
     }
-    if (ledOn && audioLevel <= kAudioLow)
+    if (audioLevel <= kAudioLow)
     {
-      ledOn = false;
       digitalWrite(kPinLights, LOW);
     }
   }
